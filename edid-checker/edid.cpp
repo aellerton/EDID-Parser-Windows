@@ -17,7 +17,14 @@ int _tmain( int argc, _TCHAR *argv [] ) {
     
     short WidthMm = -1, HeightMm = -1;
     bool bFoundDevice = GetSizeForDevID( DeviceID, WidthMm, HeightMm );
-    
+    if (bFoundDevice) {
+        printf("Found it:\n  width: %dmm\n  height: %dmm\n", WidthMm, HeightMm);
+    }
+    else {
+        printf("Failed to find it\n");
+    }
+    //MessageBox(NULL, _T("Foo"), bFoundDevice ? _T("Found it") : _T("Uh oh, failed to find it"), MB_OK);
+
     return !bFoundDevice;
     
 }
