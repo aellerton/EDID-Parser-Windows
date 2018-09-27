@@ -11,9 +11,9 @@
 
 const GUID GUID_CLASS_MONITOR = { 0x4d36e96e, 0xe325, 0x11ce, 0xbf, 0xc1, 0x08, 0x00, 0x2b, 0xe1, 0x03, 0x18 };
 
-HMONITOR g_hMonitor = NULL;
+//HMONITOR g_hMonitor = NULL;
 
-int _tmain( int argc, _TCHAR *argv [] );
+//int _tmain( int argc, _TCHAR *argv [] );
 
 // Callback called when EnumDisplayMonitors() finds a monitor to process
 BOOL CALLBACK MonitorFoundCallback( _In_ HMONITOR hMonitor, _In_ HDC hdcMonitor, _In_ LPRECT lprcMonitor, _In_ LPARAM dwData );

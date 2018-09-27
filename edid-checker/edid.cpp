@@ -4,29 +4,6 @@ int _tmain( int argc, _TCHAR *argv [] ) {
 
     // Identify the HMONITOR of interest via the callback MonitorFoundCallback
     EnumDisplayMonitors( NULL, NULL, MonitorFoundCallback, NULL );
-    
-    DISPLAY_DEVICE ddMon;
-    
-    if( DisplayDeviceFromHMonitor( g_hMonitor, ddMon ) == FALSE ) {
-        return 1;
-    }
-    
-    CString DeviceID;
-    DeviceID.Format( _T( "%s" ), ddMon.DeviceID );
-    DeviceID = Get2ndSlashBlock( DeviceID );
-    
-    short WidthMm = -1, HeightMm = -1;
-    bool bFoundDevice = GetSizeForDevID( DeviceID, WidthMm, HeightMm );
-    if (bFoundDevice) {
-        printf("Found it:\n  width: %dmm\n  height: %dmm\n", WidthMm, HeightMm);
-    }
-    else {
-        printf("Failed to find it\n");
-    }
-    //MessageBox(NULL, _T("Foo"), bFoundDevice ? _T("Found it") : _T("Uh oh, failed to find it"), MB_OK);
-
-    return !bFoundDevice;
-    
 }
 
 BOOL CALLBACK MonitorFoundCallback( _In_ HMONITOR hMonitor, _In_ HDC hdcMonitor, _In_ LPRECT lprcMonitor, _In_ LPARAM dwData ) {
@@ -36,14 +13,50 @@ BOOL CALLBACK MonitorFoundCallback( _In_ HMONITOR hMonitor, _In_ HDC hdcMonitor,
     mi.cbSize = sizeof( MONITORINFOEX );
     
     GetMonitorInfo( hMonitor, &mi );
-    OutputDebugString( mi.szDevice );
-    OutputDebugString( _T( "\n" ) );
+    //OutputDebugString( mi.szDevice );
+    //OutputDebugString( _T( "\n" ) );
     
     // For simplicity, we set the first monitor to be the one of interest
-    if( g_hMonitor == NULL ) {
-        g_hMonitor = hMonitor;
-    }
+    //if( g_hMonitor == NULL ) {
+    //    g_hMonitor = hMonitor;
+    //}
     
+
+    DISPLAY_DEVICE ddMon;
+
+    if (DisplayDeviceFromHMonitor(hMonitor, ddMon) == FALSE) {
+        return 1;
+    }
+
+    CString DeviceID;
+    DeviceID.Format(_T("%s"), ddMon.DeviceID);
+    DeviceID = Get2ndSlashBlock(DeviceID);
+
+    short WidthMm = -1, HeightMm = -1;
+    bool bFoundDevice = GetSizeForDevID(DeviceID, WidthMm, HeightMm);
+    if (bFoundDevice) {
+        CT2A deviceName(mi.szDevice);
+        CT2A deviceId(ddMon.DeviceID);
+        CT2A deviceStr(ddMon.DeviceString);
+
+        printf("Found monitor:\n");
+        printf("  name: [%s]\n", deviceName.m_psz);
+        printf("  device name: [%s]\n", deviceId.m_psz);
+        printf("  device str: [%s]\n", deviceStr.m_psz);
+        printf("  status: %s\n", (mi.dwFlags & MONITORINFOF_PRIMARY == MONITORINFOF_PRIMARY ? "Primary" : "Not-primary"));
+        printf("  is-active: %s\n", (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE > 0 ? "true" : "false"));
+        printf("  rect (LTRB): %d %d %d %d\n", mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right, mi.rcMonitor.bottom);
+        printf("  work (LTRB): %d %d %d %d\n", mi.rcWork.left, mi.rcWork.top, mi.rcWork.right, mi.rcWork.bottom);
+        printf("  physical width x height: %dmm  x  %dmm\n", WidthMm, HeightMm);
+        printf("  %1.1f px per mm\n", (mi.rcMonitor.right - mi.rcMonitor.left) / (float)WidthMm);
+        printf("  %1.3f mm per px\n", WidthMm / (float)(mi.rcMonitor.right - mi.rcMonitor.left));
+    }
+    else {
+        printf("Failed to find monitor\n");
+    }
+    //MessageBox(NULL, _T("Foo"), bFoundDevice ? _T("Found it") : _T("Uh oh, failed to find it"), MB_OK);
+
+    //return !bFoundDevice;
     return TRUE;
     
 }
