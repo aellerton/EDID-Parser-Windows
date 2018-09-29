@@ -13,14 +13,6 @@ BOOL CALLBACK MonitorFoundCallback( _In_ HMONITOR hMonitor, _In_ HDC hdcMonitor,
     mi.cbSize = sizeof( MONITORINFOEX );
     
     GetMonitorInfo( hMonitor, &mi );
-    //OutputDebugString( mi.szDevice );
-    //OutputDebugString( _T( "\n" ) );
-    
-    // For simplicity, we set the first monitor to be the one of interest
-    //if( g_hMonitor == NULL ) {
-    //    g_hMonitor = hMonitor;
-    //}
-    
 
     DISPLAY_DEVICE ddMon;
 
@@ -43,8 +35,8 @@ BOOL CALLBACK MonitorFoundCallback( _In_ HMONITOR hMonitor, _In_ HDC hdcMonitor,
         printf("  name: [%s]\n", deviceName.m_psz);
         printf("  device name: [%s]\n", deviceId.m_psz);
         printf("  device str: [%s]\n", deviceStr.m_psz);
-        printf("  status: %s\n", (mi.dwFlags & MONITORINFOF_PRIMARY == MONITORINFOF_PRIMARY ? "Primary" : "Not-primary"));
-        printf("  is-active: %s\n", (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE > 0 ? "true" : "false"));
+        printf("  status: %s\n", (mi.dwFlags & MONITORINFOF_PRIMARY) > 0 ? "Primary" : "Not-primary");
+        printf("  is-active: %s\n", (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE) > 0 ? "true" : "false");
         printf("  rect (LTRB): %d %d %d %d\n", mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right, mi.rcMonitor.bottom);
         printf("  work (LTRB): %d %d %d %d\n", mi.rcWork.left, mi.rcWork.top, mi.rcWork.right, mi.rcWork.bottom);
         printf("  physical width x height: %dmm  x  %dmm\n", WidthMm, HeightMm);
@@ -54,11 +46,7 @@ BOOL CALLBACK MonitorFoundCallback( _In_ HMONITOR hMonitor, _In_ HDC hdcMonitor,
     else {
         printf("Failed to find monitor\n");
     }
-    //MessageBox(NULL, _T("Foo"), bFoundDevice ? _T("Found it") : _T("Uh oh, failed to find it"), MB_OK);
-
-    //return !bFoundDevice;
     return TRUE;
-    
 }
 
 BOOL DisplayDeviceFromHMonitor( HMONITOR hMonitor, DISPLAY_DEVICE &ddMonOut ) {
@@ -96,30 +84,23 @@ BOOL DisplayDeviceFromHMonitor( HMONITOR hMonitor, DISPLAY_DEVICE &ddMonOut ) {
             
             ZeroMemory( &ddMon, sizeof( ddMon ) );
             ddMon.cb = sizeof( ddMon );
-            
         }
         
         ZeroMemory( &dd, sizeof( dd ) );
         dd.cb = sizeof( dd );
-        
     }
-    
     return FALSE;
-    
 }
 
 CString Get2ndSlashBlock( const CString &sIn ) {
-
     int FirstSlash = sIn.Find( _T( '\\' ) );
     CString sOut = sIn.Right( sIn.GetLength() - FirstSlash - 1 );
     FirstSlash = sOut.Find( _T( '\\' ) );
     sOut = sOut.Left( FirstSlash );
     return sOut;
-    
 }
 
 bool GetSizeForDevID( const CString &TargetDevID, short &WidthMm, short &HeightMm ) {
-
     HDEVINFO devInfo = SetupDiGetClassDevsEx(
                            &GUID_CLASS_MONITOR,             // Class GUID
                            NULL,                            // Enumerator
@@ -169,7 +150,6 @@ bool GetSizeForDevID( const CString &TargetDevID, short &WidthMm, short &HeightM
     
     SetupDiDestroyDeviceInfoList( devInfo );
     return bRes;
-    
 }
 
 bool GetMonitorSizeFromEDID( const HKEY hEDIDRegKey, short &WidthMm, short &HeightMm ) {
@@ -195,7 +175,5 @@ bool GetMonitorSizeFromEDID( const HKEY hEDIDRegKey, short &WidthMm, short &Heig
         
         return true; // valid EDID found
     }
-    
     return false; // EDID not found
-    
 }
